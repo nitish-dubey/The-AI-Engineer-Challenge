@@ -16,10 +16,14 @@ app = FastAPI(title="OpenAI Chat API")
 # This allows the API to be accessed from different domains/origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows requests from any origin
-    allow_credentials=True,  # Allows cookies to be included in requests
-    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allows all headers in requests
+    allow_origins=[
+        "https://ai-engineer-frontend.vercel.app",  # Production frontend domain
+        "https://*.vercel.app",  # Allow any Vercel subdomain (for preview deployments)
+        "http://localhost:3000"  # Local development
+    ],  # Allows requests from production frontend, preview deployments, and local dev
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Define the data model for chat requests using Pydantic
@@ -65,6 +69,11 @@ async def chat(request: ChatRequest):
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok"}
+
+# Add a root endpoint to prevent redirects
+@app.get("/")
+async def root():
+    return {"message": "AI Engineer Challenge Backend API"}
 
 # Entry point for running the application directly
 if __name__ == "__main__":
